@@ -1,0 +1,44 @@
+# Backend Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+.venv
+*.egg-info/
+*.log
+.pytest_cache/
+.coverage
+tasks.db
+.DS_Store
+
+# Flutter
+build/
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+*.iml
+.idea/
+.gradle/
+local.properties
+.classpath
+.project
+.settings/
+
+# IDEs
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# General
+.DS_Store
+*.swp
+*.swo
+*~
+.env
+.env.local
