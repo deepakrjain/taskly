@@ -36,7 +36,7 @@ class AppTheme {
       scaffoldBackgroundColor: backgroundLight,
       
       // Color scheme
-      colorScheme: ColorScheme.light(
+      colorScheme: const ColorScheme.light(
         primary: primary,
         secondary: secondary,
         tertiary: violet,
@@ -142,19 +142,19 @@ class AppTheme {
       // Input decoration theme
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: Color(0xFFF8F9FA),
-        contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        fillColor: const Color(0xFFF8F9FA),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: dividerColor),
+          borderSide: const BorderSide(color: dividerColor),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: dividerColor),
+          borderSide: const BorderSide(color: dividerColor),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: primary, width: 2),
+          borderSide: const BorderSide(color: primary, width: 2),
         ),
         labelStyle: GoogleFonts.poppins(
           fontSize: 14,
@@ -173,7 +173,7 @@ class AppTheme {
         style: ElevatedButton.styleFrom(
           backgroundColor: primary,
           foregroundColor: Colors.white,
-          padding: EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
@@ -186,7 +186,7 @@ class AppTheme {
       ),
       
       // Floating action button theme
-      floatingActionButtonTheme: FloatingActionButtonThemeData(
+      floatingActionButtonTheme: const FloatingActionButtonThemeData(
         backgroundColor: secondary,
         foregroundColor: Colors.white,
         elevation: 8,
@@ -194,7 +194,7 @@ class AppTheme {
       
       // Chip theme
       chipTheme: ChipThemeData(
-        backgroundColor: Color(0xFFF0F0F0),
+        backgroundColor: const Color(0xFFF0F0F0),
         selectedColor: secondary,
         labelStyle: GoogleFonts.poppins(
           fontSize: 13,
@@ -206,7 +206,7 @@ class AppTheme {
       ),
       
       // Divider theme
-      dividerTheme: DividerThemeData(
+      dividerTheme: const DividerThemeData(
         color: dividerColor,
         thickness: 0.8,
         space: 16,
