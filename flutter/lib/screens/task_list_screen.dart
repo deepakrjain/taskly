@@ -4,12 +4,22 @@ import '../models/task.dart';
 import '../models/task_status.dart';
 import '../providers/task_provider.dart';
 import '../theme/app_theme.dart';
+import '../widgets/search_filter_bar.dart';
+import 'task_edit_screen.dart';
 
-class TaskListScreen extends ConsumerWidget {
+class TaskListScreen extends ConsumerStatefulWidget {
   const TaskListScreen({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<TaskListScreen> createState() => _TaskListScreenState();
+}
+
+class _TaskListScreenState extends ConsumerState<TaskListScreen> {
+  String searchQuery = '';
+  String statusFilter = '';
+
+  @override
+  Widget build(BuildContext context) {
     final tasksAsyncValue = ref.watch(tasksProvider);
     final isLoading = ref.watch(isLoadingProvider);
 
@@ -19,76 +29,110 @@ class TaskListScreen extends ConsumerWidget {
         elevation: 0,
         centerTitle: true,
       ),
-      body: tasksAsyncValue.when(
-        loading: () => const Center(
-          child: CircularProgressIndicator(),
-        ),
-        error: (error, stackTrace) => Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                Icons.error_outline,
-                size: 80,
-                color: Theme.of(context).colorScheme.error,
-              ),
-              const SizedBox(height: 16),
-              Text(
-                'Error loading tasks',
-                style: Theme.of(context).textTheme.displaySmall,
-              ),
-              const SizedBox(height: 8),
-              Text(
-                error.toString(),
-                style: Theme.of(context).textTheme.bodyMedium,
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 16),
-              ElevatedButton.icon(
-                onPressed: () {
-                  ref.refresh(tasksProvider);
-                },
-                icon: const Icon(Icons.refresh),
-                label: const Text('Retry'),
-              ),
-            ],
-          ),
-        ),
-        data: (tasks) {
-          if (tasks.isEmpty) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.task_alt,
-                    size: 80,
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'Welcome to Taskly',
-                    style: Theme.of(context).textTheme.displaySmall,
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Create your first task to get started',
-                    style: Theme.of(context).textTheme.bodyMedium,
-                  ),
-                ],
-              ),
-            );
-          }
-
-          return ListView.builder(
-            padding: const EdgeInsets.all(16),
-            itemCount: tasks.length,
-            itemBuilder: (context, index) {
-              final task = tasks[index];
-              return _TaskCard(task: task, ref: ref);
+      body: Column(
+        children: [
+          // Search and filter bar
+          SearchFilterBar(
+            initialSearchQuery: searchQuery,
+            initialStatusFilter: statusFilter,
+            onSearchChanged: (query) async {
+              setState(() => searchQuery = query);
+              await ref.read(tasksProvider.notifier).searchTasks(query);
             },
-          );
-        },
+            onStatusFilterChanged: (status) async {
+              setState(() => statusFilter = status);
+              await ref.read(tasksProvider.notifier).filterByStatus(status);
+            },
+          ),
+          // Task list
+          Expanded(
+            child: tasksAsyncValue.when(
+              loading: () => const Center(
+                child: CircularProgressIndicator(),
+              ),
+              error: (error, stackTrace) => Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.error_outline,
+                      size: 80,
+                      color: Theme.of(context).colorScheme.error,
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Error loading tasks',
+                      style: Theme.of(context).textTheme.displaySmall,
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      error.toString(),
+                      style: Theme.of(context).textTheme.bodyMedium,
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 16),
+                    ElevatedButton.icon(
+                      onPressed: () {
+                        ref.refresh(tasksProvider);
+                      },
+                      icon: const Icon(Icons.refresh),
+                      label: const Text('Retry'),
+                    ),
+                  ],
+                ),
+              ),
+              data: (tasks) {
+                if (tasks.isEmpty) {
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.task_alt,
+                          size: 80,
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          'Welcome to Taskly',
+                          style: Theme.of(context).textTheme.displaySmall,
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          searchQuery.isNotEmpty || statusFilter.isNotEmpty
+                              ? 'No tasks match your filters'
+                              : 'Create your first task to get started',
+                          style: Theme.of(context).textTheme.bodyMedium,
+                        ),
+                      ],
+                    ),
+                  );
+                }
+
+                return ListView.builder(
+                  padding: const EdgeInsets.all(16),
+                  itemCount: tasks.length,
+                  itemBuilder: (context, index) {
+                    final task = tasks[index];
+                    return _TaskCard(
+                      task: task,
+                      ref: ref,
+                      onEditPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                TaskEditScreen(task: task),
+                          ),
+                        );
+                      },
+                    );
+                  },
+                );
+              },
+            ),
+          ),
+        ],
       ),
       floatingActionButton: isLoading
           ? null
@@ -199,17 +243,19 @@ class TaskListScreen extends ConsumerWidget {
   }
 }
 
-class _TaskCard extends ConsumerWidget {
+class _TaskCard extends StatelessWidget {
   final Task task;
   final WidgetRef ref;
+  final VoidCallback onEditPressed;
 
   const _TaskCard({
     required this.task,
     required this.ref,
+    required this.onEditPressed,
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final statusColor = AppTheme.getStatusColor(task.status);
     final statusBgColor = AppTheme.getStatusBackgroundColor(task.status);
 
@@ -294,18 +340,12 @@ class _TaskCard extends ConsumerWidget {
                   children: [
                     IconButton(
                       icon: const Icon(Icons.edit),
-                      onPressed: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Edit task - coming in next step'),
-                          ),
-                        );
-                      },
+                      onPressed: onEditPressed,
                       visualDensity: VisualDensity.compact,
                     ),
                     IconButton(
                       icon: const Icon(Icons.delete),
-                      onPressed: () => _showDeleteConfirmation(context, ref),
+                      onPressed: () => _showDeleteConfirmation(context),
                       visualDensity: VisualDensity.compact,
                     ),
                   ],
@@ -318,7 +358,7 @@ class _TaskCard extends ConsumerWidget {
     );
   }
 
-  void _showDeleteConfirmation(BuildContext context, WidgetRef ref) {
+  void _showDeleteConfirmation(BuildContext context) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
