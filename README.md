@@ -218,9 +218,3 @@ flutter clean
 flutter pub get
 flutter run
 ```
-
----
-
-## 📄 License
-
-This project is licensed under the [MIT License](LICENSE). See LICENSE file for details.
