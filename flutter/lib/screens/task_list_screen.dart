@@ -8,6 +8,8 @@ import '../providers/task_provider.dart';
 import '../providers/theme_provider.dart';
 import '../theme/app_theme.dart';
 import '../widgets/search_filter_bar.dart';
+import '../utils/page_transitions.dart';
+import '../utils/task_sorting.dart';
 import 'task_edit_screen.dart';
 
 class TaskListScreen extends ConsumerStatefulWidget {
@@ -145,7 +147,9 @@ class _TaskListScreenState extends ConsumerState<TaskListScreen> {
                 ),
               ),
               data: (tasks) {
-                if (tasks.isEmpty) {
+                // Sort tasks by due date (nearest first) and then by priority
+                final sortedTasks = sortTasksByDueDateAndPriority(tasks);
+                if (sortedTasks.isEmpty) {
                   return Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -179,23 +183,22 @@ class _TaskListScreenState extends ConsumerState<TaskListScreen> {
                     if (oldIndex < newIndex) {
                       newIndex -= 1;
                     }
-                    _reorderTasks(ref, tasks, oldIndex, newIndex);
+                    _reorderTasks(ref, sortedTasks, oldIndex, newIndex);
                   },
                   children: [
-                    for (int index = 0; index < tasks.length; index++)
+                    for (int index = 0; index < sortedTasks.length; index++)
                       Container(
-                        key: ValueKey(tasks[index].id),
+                        key: ValueKey(sortedTasks[index].id),
                         margin: const EdgeInsets.only(bottom: 12),
                         child: _TaskCard(
-                          task: tasks[index],
+                          task: sortedTasks[index],
                           ref: ref,
                           index: index,
                           onEditPressed: () {
                             Navigator.push(
                               context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    TaskEditScreen(task: tasks[index]),
+                              SmoothPageTransition(
+                                page: TaskEditScreen(task: sortedTasks[index]),
                               ),
                             );
                           },

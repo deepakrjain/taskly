@@ -26,12 +26,19 @@ class AppTheme {
   static const Color mediumPriorityOrange = Color(0xFFF39C12);
   static const Color highPriorityRed = Color(0xFFE74C3C);
   
-  /// Neutral colors
+  /// Neutral colors - Light
   static const Color backgroundLight = Color(0xFFFAFAFA);
   static const Color surfaceLight = Color(0xFFFFFFFF);
   static const Color textDark = Color(0xFF2C3E50);
   static const Color textMuted = Color(0xFF95A5A6);
   static const Color dividerColor = Color(0xFFECF0F1);
+  
+  /// Neutral colors - Dark
+  static const Color backgroundDark = Color(0xFF121212);
+  static const Color surfaceDark = Color(0xFF1E1E1E);
+  static const Color textLight = Color(0xFFECECEC);
+  static const Color textMutedDark = Color(0xFF9E9E9E);
+  static const Color dividerColorDark = Color(0xFF2A2A2A);
   
   /// Get light theme
   static ThemeData getLightTheme() {
@@ -218,6 +225,197 @@ class AppTheme {
       // Divider theme
       dividerTheme: const DividerThemeData(
         color: dividerColor,
+        thickness: 0.8,
+        space: 16,
+      ),
+    );
+  }
+  
+  /// Get dark theme
+  static ThemeData getDarkTheme() {
+    return ThemeData(
+      useMaterial3: true,
+      brightness: Brightness.dark,
+      primaryColor: primary,
+      scaffoldBackgroundColor: backgroundDark,
+      
+      // Color scheme
+      colorScheme: const ColorScheme.dark(
+        primary: primary,
+        secondary: secondary,
+        tertiary: violet,
+        surface: surfaceDark,
+        background: backgroundDark,
+        error: Color(0xFFE74C3C),
+      ),
+      
+      // Text theme
+      textTheme: TextTheme(
+        displayLarge: TextStyle(
+          fontSize: 32,
+          fontWeight: FontWeight.w700,
+          color: textLight,
+        ),
+        displayMedium: TextStyle(
+          fontSize: 28,
+          fontWeight: FontWeight.w700,
+          color: textLight,
+        ),
+        displaySmall: TextStyle(
+          fontSize: 24,
+          fontWeight: FontWeight.w600,
+          color: textLight,
+        ),
+        headlineMedium: TextStyle(
+          fontSize: 22,
+          fontWeight: FontWeight.w600,
+          color: textLight,
+        ),
+        headlineSmall: TextStyle(
+          fontSize: 20,
+          fontWeight: FontWeight.w600,
+          color: textLight,
+        ),
+        titleLarge: TextStyle(
+          fontSize: 18,
+          fontWeight: FontWeight.w600,
+          color: textLight,
+        ),
+        titleMedium: TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.w600,
+          color: textLight,
+        ),
+        titleSmall: TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.w600,
+          color: textLight,
+        ),
+        bodyLarge: TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.w400,
+          color: textLight,
+        ),
+        bodyMedium: TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.w400,
+          color: textLight,
+        ),
+        bodySmall: TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.w400,
+          color: textMutedDark,
+        ),
+        labelLarge: TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.w600,
+          color: textLight,
+        ),
+        labelMedium: TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
+          color: textMutedDark,
+        ),
+      ),
+      
+      // AppBar theme
+      appBarTheme: AppBarTheme(
+        backgroundColor: surfaceDark,
+        foregroundColor: textLight,
+        elevation: 0,
+        centerTitle: false,
+        titleTextStyle: TextStyle(
+          fontSize: 22,
+          fontWeight: FontWeight.w700,
+          color: textLight,
+        ),
+      ),
+      
+      // Card theme
+      cardTheme: CardThemeData(
+        color: surfaceDark,
+        elevation: 2,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        margin: EdgeInsets.zero,
+      ),
+      
+      // Input decoration theme
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        fillColor: const Color(0xFF2A2A2A),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: dividerColorDark),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: dividerColorDark),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: primary, width: 2),
+        ),
+        labelStyle: TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.w500,
+          color: textMutedDark,
+        ),
+        hintStyle: TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.w400,
+          color: textMutedDark,
+        ),
+      ),
+      
+      // Elevated button theme
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: primary,
+          foregroundColor: Colors.white,
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          textStyle: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+          ),
+          elevation: 4,
+        ),
+      ),
+      
+      // Floating action button theme
+      floatingActionButtonTheme: FloatingActionButtonThemeData(
+        backgroundColor: secondary,
+        foregroundColor: Colors.white,
+        elevation: 8,
+        extendedPadding: const EdgeInsets.symmetric(horizontal: 20),
+        extendedTextStyle: const TextStyle(
+          fontWeight: FontWeight.w600,
+          fontSize: 16,
+          letterSpacing: 0.5,
+        ),
+      ),
+      
+      // Chip theme
+      chipTheme: ChipThemeData(
+        backgroundColor: const Color(0xFF2A2A2A),
+        selectedColor: secondary,
+        labelStyle: TextStyle(
+          fontSize: 13,
+          fontWeight: FontWeight.w500,
+        ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
+      ),
+      
+      // Divider theme
+      dividerTheme: const DividerThemeData(
+        color: dividerColorDark,
         thickness: 0.8,
         space: 16,
       ),
