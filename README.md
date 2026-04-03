@@ -4,6 +4,7 @@ A modern, full-stack task management application built with Flutter (frontend) a
 
 ## 📋 Table of Contents
 
+- [Project Information](#-project-information)
 - [Features](#-features)
 - [Technology Stack](#-technology-stack)
 - [Installation](#-installation)
@@ -12,6 +13,117 @@ A modern, full-stack task management application built with Flutter (frontend) a
 - [API Documentation](#-api-documentation)
 - [Configuration](#-configuration)
 - [Development](#-development)
+
+---
+
+## 🎯 Project Information
+
+### Track & Goals
+- **Track:** A
+- **Stretch Goal:** Recurring Tasks Logic & Persistent Drag-and-Drop
+
+---
+
+## 🤖 AI Usage Report
+
+### Overview
+This project was developed with AI assistance to accelerate development and improve code quality. Below is a summary of AI usage, helpful prompts, and instances of AI-generated code that required fixes.
+
+### Helpful Prompts
+
+#### Prompt 1: GitHub Repository Setup
+**First Prompt:**
+> "You are an expert Flutter developer and Python backend engineer. I need you to build a complete, production-quality Task Management app. Follow every instruction precisely.
+
+## OVERVIEW
+
+Build a full-stack Task Management app:
+- Frontend: Flutter & Dart
+- Backend: Python (FastAPI preferred)
+- Database: SQLite (via SQLAlchemy)
+
+The UI must be COLORFUL and PLAYFUL — think vibrant accent colors, rounded cards, smooth animations, and delightful micro-interactions. This is the most important first impression. Do NOT use default Flutter grey/white Material UI. Use a custom theme with a rich color palette.
+
+## TECH STACK
+
+Frontend:
+- Flutter (latest stable)
+- State management: Riverpod (preferred) or Bloc
+- Local draft persistence: shared_preferences
+- HTTP client: dio or http package
+- Animations: Use Hero transitions, AnimatedList, or Lottie where appropriate
+
+Backend:
+- Python + FastAPI
+- SQLAlchemy ORM
+- SQLite database
+- Pydantic models for validation
+- CORS enabled for Flutter dev
+-
+
+## DATA MODEL
+
+Every Task must have exactly these fields:
+- id: UUID (auto-generated)
+- title: String (required)
+- description: String (required)
+- due_date: Date
+- status: Enum → "To-Do" | "In Progress" | "Done"
+- blocked_by: Optional UUID → references another task's id
+- order_index: Integer → for drag-and-drop ordering
+- is_recurring: Boolean (default false)
+- recurrence_type: Optional Enum → "Daily" | "Weekly"
+- created_at: DateTime (auto)
+- updated_at: DateTime (auto)
+
+## BACKEND REQUIREMENTS (FastAPI)
+
+Build a REST API with these endpoints:
+
+  GET    /tasks           → list all tasks (support ?search=&status= query params)
+  GET    /tasks/{id}      → get single task
+  POST   /tasks           → create task (simulate 2-second delay before responding)
+  PUT    /tasks/{id}      → update task (simulate 2-second delay before responding)
+  DELETE /tasks/{id}      → delete task
+  PATCH  /tasks/reorder   → accepts an ordered list of task IDs, updates order_index for all
+
+## FLUTTER APP REQUIREMENTS
+
+### Theme & UI
+- Define a custom ThemeData with a vibrant, playful color palette (e.g. coral, teal, amber, violet)
+- Rounded corners everywhere (BorderRadius.circular(16) or higher)
+- Cards should have subtle drop shadows and color-coded left border strips based on status:
+    • "To-Do" → Blue
+    • "In Progress" → Amber/Orange
+    • "Done" → Green
+- Blocked tasks: card appears greyed out with a lock icon overlay until the blocking task is "Done"
+- Use a bottom navigation bar or a floating action button with smooth reveal animation
+
+## ANIMATIONS & POLISH (important for UI score)
+
+- Task cards should animate in with a fade+slide when the list loads (staggered, 50ms delay per item)
+- When a task is deleted, animate it out (AnimatedList removal or slide-out)
+- When status changes to "Done", briefly animate the card (e.g. quick green flash or checkmark pop)
+- The FAB should use a SpeedDial or animated expand if you add sub-actions
+- Add subtle haptic feedback on key actions (task saved, task deleted)
+
+## CONSTRAINTS & RULES
+
+- Do NOT use setState excessively — use Riverpod or Bloc properly
+- All API calls must be async and non-blocking
+- Handle errors gracefully: show snackbars for failures, not crashes
+- The app must work on both Android and iOS
+- Code must be clean, well-commented, and split into logical files
+
+**Result:** This comprehensive, well-structured prompt generated the complete Taskly project architecture and implementation.
+
+**How it was useful:** 
+- Provided clear, granular specifications for the data model (task fields, enums, auto-generation)
+- Specified exact backend endpoints with required functionality (search params, reorder logic, 2-second delays)
+- Defined custom theming requirements with color-coded task cards based on status
+- Included animation and polish guidelines (fade+slide stagger, status-change animations, haptic feedback)
+- Established technical constraints (Riverpod state management, async patterns, error handling)
+- Eliminated ambiguity by being explicit about every requirement, resulting in a cohesive full-stack application with consistent design language
 
 ---
 
