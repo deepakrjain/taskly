@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import '../models/task_status.dart';
 
 /// Custom app theme with vibrant, playful colors
 class AppTheme {
@@ -45,74 +45,72 @@ class AppTheme {
         error: Color(0xFFE74C3C),
       ),
       
-      // Text theme with Google Fonts (Poppins)
-      textTheme: GoogleFonts.poppinsTextTheme(
-        TextTheme(
-          displayLarge: GoogleFonts.poppins(
-            fontSize: 32,
-            fontWeight: FontWeight.w700,
-            color: textDark,
-          ),
-          displayMedium: GoogleFonts.poppins(
-            fontSize: 28,
-            fontWeight: FontWeight.w700,
-            color: textDark,
-          ),
-          displaySmall: GoogleFonts.poppins(
-            fontSize: 24,
-            fontWeight: FontWeight.w600,
-            color: textDark,
-          ),
-          headlineMedium: GoogleFonts.poppins(
-            fontSize: 22,
-            fontWeight: FontWeight.w600,
-            color: textDark,
-          ),
-          headlineSmall: GoogleFonts.poppins(
-            fontSize: 20,
-            fontWeight: FontWeight.w600,
-            color: textDark,
-          ),
-          titleLarge: GoogleFonts.poppins(
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-            color: textDark,
-          ),
-          titleMedium: GoogleFonts.poppins(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-            color: textDark,
-          ),
-          titleSmall: GoogleFonts.poppins(
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-            color: textDark,
-          ),
-          bodyLarge: GoogleFonts.poppins(
-            fontSize: 16,
-            fontWeight: FontWeight.w400,
-            color: textDark,
-          ),
-          bodyMedium: GoogleFonts.poppins(
-            fontSize: 14,
-            fontWeight: FontWeight.w400,
-            color: textDark,
-          ),
-          bodySmall: GoogleFonts.poppins(
-            fontSize: 12,
-            fontWeight: FontWeight.w400,
-            color: textMuted,
-          ),
-          labelLarge: GoogleFonts.poppins(
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-            color: textDark,
-          ),
-          labelMedium: GoogleFonts.poppins(
-            fontSize: 12,
-            fontWeight: FontWeight.w600,
-            color: textMuted,
-          ),
+      // Text theme
+      textTheme: TextTheme(
+        displayLarge: TextStyle(
+          fontSize: 32,
+          fontWeight: FontWeight.w700,
+          color: textDark,
+        ),
+        displayMedium: TextStyle(
+          fontSize: 28,
+          fontWeight: FontWeight.w700,
+          color: textDark,
+        ),
+        displaySmall: TextStyle(
+          fontSize: 24,
+          fontWeight: FontWeight.w600,
+          color: textDark,
+        ),
+        headlineMedium: TextStyle(
+          fontSize: 22,
+          fontWeight: FontWeight.w600,
+          color: textDark,
+        ),
+        headlineSmall: TextStyle(
+          fontSize: 20,
+          fontWeight: FontWeight.w600,
+          color: textDark,
+        ),
+        titleLarge: TextStyle(
+          fontSize: 18,
+          fontWeight: FontWeight.w600,
+          color: textDark,
+        ),
+        titleMedium: TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.w600,
+          color: textDark,
+        ),
+        titleSmall: TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.w600,
+          color: textDark,
+        ),
+        bodyLarge: TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.w400,
+          color: textDark,
+        ),
+        bodyMedium: TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.w400,
+          color: textDark,
+        ),
+        bodySmall: TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.w400,
+          color: textMuted,
+        ),
+        labelLarge: TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.w600,
+          color: textDark,
+        ),
+        labelMedium: TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
+          color: textMuted,
         ),
       ),
       
@@ -122,7 +120,7 @@ class AppTheme {
         foregroundColor: textDark,
         elevation: 0,
         centerTitle: false,
-        titleTextStyle: GoogleFonts.poppins(
+        titleTextStyle: TextStyle(
           fontSize: 22,
           fontWeight: FontWeight.w700,
           color: textDark,
@@ -130,7 +128,7 @@ class AppTheme {
       ),
       
       // Card theme
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         color: surfaceLight,
         elevation: 2,
         shape: RoundedRectangleBorder(
@@ -156,12 +154,12 @@ class AppTheme {
           borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(color: primary, width: 2),
         ),
-        labelStyle: GoogleFonts.poppins(
+        labelStyle: TextStyle(
           fontSize: 14,
           fontWeight: FontWeight.w500,
           color: textMuted,
         ),
-        hintStyle: GoogleFonts.poppins(
+        hintStyle: TextStyle(
           fontSize: 14,
           fontWeight: FontWeight.w400,
           color: textMuted,
@@ -177,7 +175,7 @@ class AppTheme {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
-          textStyle: GoogleFonts.poppins(
+          textStyle: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w600,
           ),
@@ -196,7 +194,7 @@ class AppTheme {
       chipTheme: ChipThemeData(
         backgroundColor: const Color(0xFFF0F0F0),
         selectedColor: secondary,
-        labelStyle: GoogleFonts.poppins(
+        labelStyle: TextStyle(
           fontSize: 13,
           fontWeight: FontWeight.w500,
         ),
@@ -214,31 +212,27 @@ class AppTheme {
     );
   }
   
-  /// Get status color based on status string
-  static Color getStatusColor(String status) {
-    switch (status.toLowerCase()) {
-      case 'to-do':
+  /// Get status color based on TaskStatus enum
+  static Color getStatusColor(TaskStatus status) {
+    switch (status) {
+      case TaskStatus.todo:
         return todoBlue;
-      case 'in progress':
+      case TaskStatus.inProgress:
         return inProgressOrange;
-      case 'done':
+      case TaskStatus.done:
         return doneGreen;
-      default:
-        return todoBlue;
     }
   }
   
   /// Get status background color (light variant)
-  static Color getStatusBackgroundColor(String status) {
-    switch (status.toLowerCase()) {
-      case 'to-do':
+  static Color getStatusBackgroundColor(TaskStatus status) {
+    switch (status) {
+      case TaskStatus.todo:
         return todoBlue.withOpacity(0.1);
-      case 'in progress':
+      case TaskStatus.inProgress:
         return inProgressOrange.withOpacity(0.1);
-      case 'done':
+      case TaskStatus.done:
         return doneGreen.withOpacity(0.1);
-      default:
-        return todoBlue.withOpacity(0.1);
     }
   }
 }
