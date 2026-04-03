@@ -70,6 +70,7 @@ async def create_task(task_data: TaskCreate, db: Session = Depends(get_db)):
         description=task_data.description,
         due_date=task_data.due_date,
         status=task_data.status,
+        priority=task_data.priority,
         blocked_by=task_data.blocked_by,
         order_index=next_order,
         is_recurring=task_data.is_recurring,
@@ -109,6 +110,8 @@ async def update_task(
         db_task.due_date = task_data.due_date
     if task_data.status is not None:
         db_task.status = task_data.status
+    if task_data.priority is not None:
+        db_task.priority = task_data.priority
     if task_data.blocked_by is not None:
         db_task.blocked_by = task_data.blocked_by
     if task_data.is_recurring is not None:

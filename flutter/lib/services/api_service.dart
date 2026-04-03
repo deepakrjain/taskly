@@ -22,6 +22,7 @@ class ApiService {
     required String description,
     DateTime? dueDate,
     String? status,
+    String? priority,
     String? blockedBy,
     bool isRecurring = false,
     String? recurrenceType,
@@ -34,6 +35,7 @@ class ApiService {
           'description': description,
           'due_date': dueDate?.toIso8601String(),
           'status': status ?? 'To-Do',
+          'priority': priority ?? 'Medium',
           'blocked_by': blockedBy,
           'is_recurring': isRecurring,
           'recurrence_type': recurrenceType,
@@ -97,6 +99,7 @@ class ApiService {
     String? description,
     DateTime? dueDate,
     String? status,
+    String? priority,
     String? blockedBy,
     bool? isRecurring,
     String? recurrenceType,
@@ -107,6 +110,7 @@ class ApiService {
       if (description != null) data['description'] = description;
       if (dueDate != null) data['due_date'] = dueDate.toIso8601String();
       if (status != null) data['status'] = status;
+      if (priority != null) data['priority'] = priority;
       if (blockedBy != null) data['blocked_by'] = blockedBy;
       if (isRecurring != null) data['is_recurring'] = isRecurring;
       if (recurrenceType != null) data['recurrence_type'] = recurrenceType;

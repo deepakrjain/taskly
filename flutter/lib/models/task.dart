@@ -1,6 +1,7 @@
 import 'package:uuid/uuid.dart';
 import 'task_status.dart';
 import 'recurrence_type.dart';
+import 'task_priority.dart';
 
 class Task {
   final String id;
@@ -8,6 +9,7 @@ class Task {
   final String description;
   final DateTime? dueDate;
   final TaskStatus status;
+  final TaskPriority priority;
   final String? blockedBy;
   final int orderIndex;
   final bool isRecurring;
@@ -21,6 +23,7 @@ class Task {
     required this.description,
     this.dueDate,
     this.status = TaskStatus.todo,
+    this.priority = TaskPriority.medium,
     this.blockedBy,
     this.orderIndex = 0,
     this.isRecurring = false,
@@ -39,6 +42,7 @@ class Task {
       dueDate:
           json['due_date'] != null ? DateTime.parse(json['due_date']) : null,
       status: taskStatusFromApiValue(json['status'] ?? 'To-Do'),
+      priority: priorityFromString(json['priority'] ?? 'Medium'),
       blockedBy: json['blocked_by'],
       orderIndex: json['order_index'] ?? 0,
       isRecurring: json['is_recurring'] ?? false,
@@ -57,6 +61,7 @@ class Task {
       'description': description,
       'due_date': dueDate?.toIso8601String(),
       'status': status.apiValue,
+      'priority': priority.apiValue,
       'blocked_by': blockedBy,
       'order_index': orderIndex,
       'is_recurring': isRecurring,
@@ -70,6 +75,7 @@ class Task {
     String? description,
     DateTime? dueDate,
     TaskStatus? status,
+    TaskPriority? priority,
     String? blockedBy,
     int? orderIndex,
     bool? isRecurring,
@@ -83,6 +89,7 @@ class Task {
       description: description ?? this.description,
       dueDate: dueDate ?? this.dueDate,
       status: status ?? this.status,
+      priority: priority ?? this.priority,
       blockedBy: blockedBy ?? this.blockedBy,
       orderIndex: orderIndex ?? this.orderIndex,
       isRecurring: isRecurring ?? this.isRecurring,

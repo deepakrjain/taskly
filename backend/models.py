@@ -39,6 +39,13 @@ class RecurrenceType(str, enum.Enum):
     WEEKLY = "Weekly"
 
 
+class Priority(str, enum.Enum):
+    """Task priority enumeration"""
+    LOW = "Low"
+    MEDIUM = "Medium"
+    HIGH = "High"
+
+
 class Task(Base):
     """Task model for database"""
     __tablename__ = "tasks"
@@ -48,6 +55,7 @@ class Task(Base):
     description = Column(String(1000), nullable=False, default="")
     due_date = Column(DateTime, nullable=True)
     status = Column(Enum(TaskStatus), nullable=False, default=TaskStatus.TODO)
+    priority = Column(Enum(Priority), nullable=False, default=Priority.MEDIUM)
     blocked_by = Column(GUID, ForeignKey("tasks.id"), nullable=True)
     order_index = Column(Integer, nullable=False, default=0)
     is_recurring = Column(Boolean, nullable=False, default=False)

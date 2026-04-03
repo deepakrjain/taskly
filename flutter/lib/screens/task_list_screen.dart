@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/task.dart';
 import '../models/task_status.dart';
+import '../models/task_priority.dart';
 import '../providers/task_provider.dart';
 import '../theme/app_theme.dart';
 import '../widgets/search_filter_bar.dart';
@@ -258,6 +259,8 @@ class _TaskCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final statusColor = AppTheme.getStatusColor(task.status);
     final statusBgColor = AppTheme.getStatusBackgroundColor(task.status);
+    final priorityColor = AppTheme.getPriorityColor(task.priority);
+    final priorityBgColor = AppTheme.getPriorityBackgroundColor(task.priority);
 
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
@@ -295,6 +298,7 @@ class _TaskCard extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 12),
+                const SizedBox(width: 12),
                 Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 12,
@@ -308,6 +312,25 @@ class _TaskCard extends StatelessWidget {
                     task.status.displayName,
                     style: TextStyle(
                       color: statusColor,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 12,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
+                  decoration: BoxDecoration(
+                    color: priorityBgColor,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(
+                    task.priority.displayName,
+                    style: TextStyle(
+                      color: priorityColor,
                       fontWeight: FontWeight.bold,
                       fontSize: 12,
                     ),

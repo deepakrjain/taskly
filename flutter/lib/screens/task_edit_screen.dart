@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/task.dart';
 import '../models/task_status.dart';
+import '../models/task_priority.dart';
 import '../models/recurrence_type.dart';
 import '../providers/task_provider.dart';
 import '../theme/app_theme.dart';
@@ -22,6 +23,7 @@ class _TaskEditScreenState extends ConsumerState<TaskEditScreen> {
   late TextEditingController titleController;
   late TextEditingController descriptionController;
   late TaskStatus selectedStatus;
+  late TaskPriority selectedPriority;
   late bool isRecurring;
   late RecurrenceType? selectedRecurrence;
   late DateTime? selectedDueDate;
@@ -34,6 +36,7 @@ class _TaskEditScreenState extends ConsumerState<TaskEditScreen> {
     descriptionController =
         TextEditingController(text: widget.task.description);
     selectedStatus = widget.task.status;
+    selectedPriority = widget.task.priority;
     isRecurring = widget.task.isRecurring;
     selectedRecurrence = widget.task.recurrenceType;
     selectedDueDate = widget.task.dueDate;
@@ -75,6 +78,7 @@ class _TaskEditScreenState extends ConsumerState<TaskEditScreen> {
             description: descriptionController.text,
             dueDate: selectedDueDate,
             status: selectedStatus.apiValue,
+            priority: selectedPriority.apiValue,
             isRecurring: isRecurring,
             recurrenceType:
                 isRecurring ? selectedRecurrence?.apiValue : null,
@@ -178,6 +182,35 @@ class _TaskEditScreenState extends ConsumerState<TaskEditScreen> {
                                 AppTheme.getStatusBackgroundColor(status),
                             selectedColor:
                                 AppTheme.getStatusColor(status).withOpacity(0.3),
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Priority selector
+                  Text(
+                    'Priority',
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                  const SizedBox(height: 8),
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: TaskPriority.values.map((priority) {
+                        final isSelected = selectedPriority == priority;
+                        return Padding(
+                          padding: const EdgeInsets.only(right: 8),
+                          child: FilterChip(
+                            selected: isSelected,
+                            label: Text(priority.displayName),
+                            onSelected: (_) =>
+                                setState(() => selectedPriority = priority),
+                            backgroundColor:
+                                AppTheme.getPriorityBackgroundColor(priority),
+                            selectedColor:
+                                AppTheme.getPriorityColor(priority).withOpacity(0.3),
                           ),
                         );
                       }).toList(),

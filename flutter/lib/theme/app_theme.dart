@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/task_status.dart';
+import '../models/task_priority.dart';
 
 /// Custom app theme with vibrant, playful colors
 class AppTheme {
@@ -19,6 +20,11 @@ class AppTheme {
   static const Color todoBlue = Color(0xFF3498DB);
   static const Color inProgressOrange = Color(0xFFF39C12);
   static const Color doneGreen = Color(0xFF27AE60);
+  
+  /// Priority colors
+  static const Color lowPriorityBlue = Color(0xFF3498DB);
+  static const Color mediumPriorityOrange = Color(0xFFF39C12);
+  static const Color highPriorityRed = Color(0xFFE74C3C);
   
   /// Neutral colors
   static const Color backgroundLight = Color(0xFFFAFAFA);
@@ -233,6 +239,30 @@ class AppTheme {
         return inProgressOrange.withOpacity(0.1);
       case TaskStatus.done:
         return doneGreen.withOpacity(0.1);
+    }
+  }
+  
+  /// Get priority color based on TaskPriority enum
+  static Color getPriorityColor(TaskPriority priority) {
+    switch (priority) {
+      case TaskPriority.low:
+        return lowPriorityBlue;
+      case TaskPriority.medium:
+        return mediumPriorityOrange;
+      case TaskPriority.high:
+        return highPriorityRed;
+    }
+  }
+  
+  /// Get priority background color (light variant)
+  static Color getPriorityBackgroundColor(TaskPriority priority) {
+    switch (priority) {
+      case TaskPriority.low:
+        return lowPriorityBlue.withOpacity(0.1);
+      case TaskPriority.medium:
+        return mediumPriorityOrange.withOpacity(0.1);
+      case TaskPriority.high:
+        return highPriorityRed.withOpacity(0.1);
     }
   }
 }

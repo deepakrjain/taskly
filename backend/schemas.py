@@ -10,6 +10,7 @@ class TaskBase(BaseModel):
     description: str = Field("", max_length=1000)
     due_date: Optional[datetime] = None
     status: str = "To-Do"
+    priority: str = "Medium"
     blocked_by: Optional[UUID] = None
     is_recurring: bool = False
     recurrence_type: Optional[str] = None
@@ -26,6 +27,7 @@ class TaskUpdate(BaseModel):
     description: Optional[str] = None
     due_date: Optional[datetime] = None
     status: Optional[str] = None
+    priority: Optional[str] = None
     blocked_by: Optional[UUID] = None
     is_recurring: Optional[bool] = None
     recurrence_type: Optional[str] = None
