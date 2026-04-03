@@ -185,21 +185,19 @@ class _TaskListScreenState extends ConsumerState<TaskListScreen> {
                       Container(
                         key: ValueKey(tasks[index].id),
                         margin: const EdgeInsets.only(bottom: 12),
-                        child: ReorderableDragStartListener(
+                        child: _TaskCard(
+                          task: tasks[index],
+                          ref: ref,
                           index: index,
-                          child: _TaskCard(
-                            task: tasks[index],
-                            ref: ref,
-                            onEditPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      TaskEditScreen(task: tasks[index]),
-                                ),
-                              );
-                            },
-                          ),
+                          onEditPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    TaskEditScreen(task: tasks[index]),
+                              ),
+                            );
+                          },
                         ),
                       ),
                   ],
@@ -458,11 +456,13 @@ class _TaskListScreenState extends ConsumerState<TaskListScreen> {
 class _TaskCard extends StatelessWidget {
   final Task task;
   final WidgetRef ref;
+  final int index;
   final VoidCallback onEditPressed;
 
   const _TaskCard({
     required this.task,
     required this.ref,
+    required this.index,
     required this.onEditPressed,
   });
 
@@ -490,8 +490,7 @@ class _TaskCard extends StatelessWidget {
           ),
         ],
       ),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(16),
+      child: GestureDetector(
         onTap: onEditPressed,
         child: Padding(
           padding: const EdgeInsets.all(16),
@@ -500,10 +499,13 @@ class _TaskCard extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  Icon(
-                    Icons.drag_handle,
-                    color: isDarkMode ? Colors.grey[500] : Colors.grey[400],
-                    size: 20,
+                  ReorderableDragStartListener(
+                    index: index,
+                    child: Icon(
+                      Icons.drag_handle,
+                      color: isDarkMode ? Colors.grey[500] : Colors.grey[400],
+                      size: 20,
+                    ),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
@@ -641,7 +643,7 @@ class _TaskCard extends StatelessWidget {
             ],
           ),
         ),
-      ),
+        ),
     );
   }
 
