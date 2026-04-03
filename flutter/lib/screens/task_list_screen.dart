@@ -95,6 +95,12 @@ class _TaskListScreenState extends ConsumerState<TaskListScreen> {
                       },
                       backgroundColor: Theme.of(context).colorScheme.surface,
                       selectedColor: Theme.of(context).primaryColor.withOpacity(0.3),
+                      labelStyle: TextStyle(
+                        color: Theme.of(context).brightness == Brightness.dark
+                          ? Colors.white
+                          : Colors.black87,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
                   );
                 }).toList(),
