@@ -27,7 +27,7 @@ A modern, full-stack task management application built with Flutter (frontend) a
 ## 🤖 AI Usage Report
 
 ### Overview
-This project was developed with AI assistance to accelerate development and improve code quality. Below is a summary of AI usage, helpful prompts, and instances of AI-generated code that required fixes.
+This project was developed with AI assistance (Claude Haiku 4.5 | GitHub Copilot) to accelerate development and improve code quality. Below is a summary of AI usage, helpful prompts, and instances of AI-generated code that required fixes.
 
 ### Helpful Prompts
 
