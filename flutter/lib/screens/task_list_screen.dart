@@ -27,8 +27,8 @@ class _TaskListScreenState extends ConsumerState<TaskListScreen> {
   @override
   Widget build(BuildContext context) {
     final tasksAsyncValue = ref.watch(tasksProvider);
-    final isLoading = ref.watch(isLoadingProvider);
     final isDarkMode = ref.watch(themeProvider);
+    final isLoading = tasksAsyncValue.isLoading;
 
     return Scaffold(
       appBar: AppBar(
