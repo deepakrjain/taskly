@@ -40,6 +40,24 @@ async def list_tasks(
     return tasks
 
 
+@router.patch("/reorder")
+async def reorder_tasks(
+    request: TaskReorderRequest,
+    db: Session = Depends(get_db)
+):
+    """
+    Reorder tasks by updating their order_index field.
+    """
+    for index, task_id in enumerate(request.task_ids):
+        task = db.query(Task).filter(Task.id == task_id).first()
+        if task:
+            task.order_index = index
+            db.add(task)
+
+    db.commit()
+    return {"status": "ok", "message": "Tasks reordered successfully"}
+
+
 @router.get("/{task_id}", response_model=TaskResponse)
 async def get_task(task_id: UUID, db: Session = Depends(get_db)):
     """
@@ -136,21 +154,3 @@ async def delete_task(task_id: UUID, db: Session = Depends(get_db)):
     db.delete(db_task)
     db.commit()
     return None
-
-
-@router.patch("/reorder")
-async def reorder_tasks(
-    request: TaskReorderRequest,
-    db: Session = Depends(get_db)
-):
-    """
-    Reorder tasks by updating their order_index field.
-    """
-    for index, task_id in enumerate(request.task_ids):
-        task = db.query(Task).filter(Task.id == task_id).first()
-        if task:
-            task.order_index = index
-            db.add(task)
-
-    db.commit()
-    return {"status": "ok", "message": "Tasks reordered successfully"}

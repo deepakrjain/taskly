@@ -103,9 +103,10 @@ class TasksNotifier extends StateNotifier<AsyncValue<List<Task>>> {
     }
   }
 
-  /// Reorder tasks
+  /// Reorder tasks - updates order_index on backend
   Future<void> reorderTasks(List<String> taskIds) async {
     try {
+      // Send reorder request with task IDs in new order
       await _apiService.reorderTasks(taskIds);
 
       // Reload tasks after reordering

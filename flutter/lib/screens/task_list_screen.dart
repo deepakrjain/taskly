@@ -26,9 +26,28 @@ class _TaskListScreenState extends ConsumerState<TaskListScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Taskly'),
+        title: const Text(
+          'Taskly',
+          style: TextStyle(
+            fontSize: 28,
+            fontWeight: FontWeight.w800,
+            letterSpacing: -0.5,
+          ),
+        ),
         elevation: 0,
         centerTitle: true,
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Theme.of(context).primaryColor,
+                Theme.of(context).primaryColor.withOpacity(0.7),
+              ],
+            ),
+          ),
+        ),
       ),
       body: Column(
         children: [
@@ -110,25 +129,34 @@ class _TaskListScreenState extends ConsumerState<TaskListScreen> {
                   );
                 }
 
-                return ListView.builder(
+                return ReorderableListView(
                   padding: const EdgeInsets.all(16),
-                  itemCount: tasks.length,
-                  itemBuilder: (context, index) {
-                    final task = tasks[index];
-                    return _TaskCard(
-                      task: task,
-                      ref: ref,
-                      onEditPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                TaskEditScreen(task: task),
-                          ),
-                        );
-                      },
-                    );
+                  onReorder: (oldIndex, newIndex) {
+                    if (oldIndex < newIndex) {
+                      newIndex -= 1;
+                    }
+                    _reorderTasks(ref, tasks, oldIndex, newIndex);
                   },
+                  children: [
+                    for (int index = 0; index < tasks.length; index++)
+                      Container(
+                        key: ValueKey(tasks[index].id),
+                        margin: const EdgeInsets.only(bottom: 12),
+                        child: _TaskCard(
+                          task: tasks[index],
+                          ref: ref,
+                          onEditPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    TaskEditScreen(task: tasks[index]),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                  ],
                 );
               },
             ),
@@ -146,6 +174,27 @@ class _TaskListScreenState extends ConsumerState<TaskListScreen> {
     );
   }
 
+  void _reorderTasks(WidgetRef ref, List<Task> tasks, int oldIndex, int newIndex) async {
+    try {
+      // Create new ordered list with reordered task IDs
+      final reorderedIds = tasks.map((t) => t.id).toList();
+      reorderedIds.removeAt(oldIndex);
+      reorderedIds.insert(newIndex, tasks[oldIndex].id);
+      
+      // Send reorder request to backend
+      await ref.read(tasksProvider.notifier).reorderTasks(reorderedIds);
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error reordering: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
   void _showCreateTaskDialog(BuildContext context, WidgetRef ref) {
     final titleController = TextEditingController();
     final descriptionController = TextEditingController();
@@ -154,90 +203,149 @@ class _TaskListScreenState extends ConsumerState<TaskListScreen> {
     showDialog(
       context: context,
       builder: (context) => StatefulBuilder(
-        builder: (context, setState) => AlertDialog(
-          title: const Text('Create Task'),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  controller: titleController,
-                  decoration: const InputDecoration(
-                    labelText: 'Task Title',
-                    hintText: 'Enter task title',
-                  ),
-                ),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: descriptionController,
-                  decoration: const InputDecoration(
-                    labelText: 'Description',
-                    hintText: 'Enter task description',
-                  ),
-                  maxLines: 3,
-                ),
-                const SizedBox(height: 12),
-                if (isLoading)
-                  const Column(
+        builder: (context, setState) => Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      CircularProgressIndicator(),
-                      SizedBox(height: 12),
-                      Text('Creating task (2 seconds)...'),
+                      Text(
+                        'Create Task',
+                        style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.close),
+                        onPressed: () => Navigator.pop(context),
+                        visualDensity: VisualDensity.compact,
+                      ),
                     ],
                   ),
-              ],
+                  const SizedBox(height: 20),
+                  TextField(
+                    controller: titleController,
+                    enabled: !isLoading,
+                    decoration: InputDecoration(
+                      labelText: 'Task Title *',
+                      hintText: 'Enter task title',
+                      prefixIcon: Icon(Icons.check_circle_outline,
+                          color: Theme.of(context).primaryColor),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  TextField(
+                    controller: descriptionController,
+                    enabled: !isLoading,
+                    decoration: InputDecoration(
+                      labelText: 'Description',
+                      hintText: 'Enter task description',
+                      prefixIcon: Icon(Icons.description_outlined,
+                          color: Theme.of(context).primaryColor),
+                    ),
+                    maxLines: 3,
+                  ),
+                  const SizedBox(height: 20),
+                  if (isLoading)
+                    Column(
+                      children: [
+                        SizedBox(
+                          height: 4,
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(2),
+                            child: LinearProgressIndicator(
+                              backgroundColor: Colors.grey[200],
+                              valueColor: AlwaysStoppedAnimation(
+                                Theme.of(context).primaryColor,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          'Creating task...',
+                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: Theme.of(context).primaryColor,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                      ],
+                    ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      TextButton(
+                        onPressed: isLoading ? null : () => Navigator.pop(context),
+                        child: Text(
+                          'Cancel',
+                          style: TextStyle(
+                            color: isLoading ? Colors.grey : null,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      ElevatedButton.icon(
+                        onPressed: isLoading
+                            ? null
+                            : () async {
+                                if (titleController.text.isEmpty) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text('Task title cannot be empty'),
+                                      backgroundColor: Colors.orange,
+                                    ),
+                                  );
+                                  return;
+                                }
+
+                                setState(() => isLoading = true);
+
+                                try {
+                                  await ref.read(tasksProvider.notifier).createTask(
+                                        title: titleController.text,
+                                        description: descriptionController.text,
+                                      );
+
+                                  if (context.mounted) {
+                                    Navigator.pop(context);
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text('Task created successfully! ✓'),
+                                        duration: Duration(seconds: 2),
+                                        backgroundColor: Color(0xFF27AE60),
+                                      ),
+                                    );
+                                  }
+                                } catch (e) {
+                                  if (context.mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text('Error: ${e.toString()}'),
+                                        backgroundColor: Colors.redAccent,
+                                      ),
+                                    );
+                                    setState(() => isLoading = false);
+                                  }
+                                }
+                              },
+                        icon: const Icon(Icons.add),
+                        label: const Text('Create'),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
-          actions: [
-            TextButton(
-              onPressed: isLoading ? null : () => Navigator.pop(context),
-              child: const Text('Cancel'),
-            ),
-            ElevatedButton(
-              onPressed: isLoading
-                  ? null
-                  : () async {
-                      if (titleController.text.isEmpty) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Task title cannot be empty'),
-                          ),
-                        );
-                        return;
-                      }
-
-                      setState(() => isLoading = true);
-
-                      try {
-                        await ref.read(tasksProvider.notifier).createTask(
-                              title: titleController.text,
-                              description: descriptionController.text,
-                            );
-
-                        if (context.mounted) {
-                          Navigator.pop(context);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Task created successfully! ✓'),
-                              duration: Duration(seconds: 2),
-                            ),
-                          );
-                        }
-                      } catch (e) {
-                        if (context.mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('Error: ${e.toString()}'),
-                              backgroundColor: Colors.red,
-                            ),
-                          );
-                          Navigator.pop(context);
-                        }
-                      }
-                    },
-              child: const Text('Create'),
-            ),
-          ],
         ),
       ),
     );
@@ -262,120 +370,170 @@ class _TaskCard extends StatelessWidget {
     final priorityColor = AppTheme.getPriorityColor(task.priority);
     final priorityBgColor = AppTheme.getPriorityBackgroundColor(task.priority);
 
-    return Card(
-      margin: const EdgeInsets.only(bottom: 12),
-      shape: RoundedRectangleBorder(
+    return Container(
+      decoration: BoxDecoration(
+        color: const Color(0xFFF8F9FF),
         borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: priorityColor.withOpacity(0.3),
+          width: 2,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Theme.of(context).primaryColor.withOpacity(0.08),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        task.title,
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: 4),
-                      if (task.description.isNotEmpty)
+      child: InkWell(
+        borderRadius: BorderRadius.circular(16),
+        onTap: onEditPressed,
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Icon(
+                    Icons.drag_handle,
+                    color: Colors.grey[400],
+                    size: 20,
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
                         Text(
-                          task.description,
-                          style: Theme.of(context).textTheme.bodySmall,
+                          task.title,
+                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w700,
+                            fontSize: 16,
+                          ),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                         ),
-                    ],
-                  ),
-                ),
-                const SizedBox(width: 12),
-                const SizedBox(width: 12),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 6,
-                  ),
-                  decoration: BoxDecoration(
-                    color: statusBgColor,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Text(
-                    task.status.displayName,
-                    style: TextStyle(
-                      color: statusColor,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 12,
+                        if (task.description.isNotEmpty) ...
+                          [
+                            const SizedBox(height: 6),
+                            Text(
+                              task.description,
+                              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                color: Colors.grey[600],
+                                fontSize: 12,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                      ],
                     ),
                   ),
-                ),
-                const SizedBox(width: 8),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 6,
-                  ),
-                  decoration: BoxDecoration(
-                    color: priorityBgColor,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Text(
-                    task.priority.displayName,
-                    style: TextStyle(
-                      color: priorityColor,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 12,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                if (task.dueDate != null)
-                  Row(
+                  const SizedBox(width: 12),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
-                      Icon(
-                        Icons.calendar_today,
-                        size: 16,
-                        color: Colors.grey,
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 5,
+                        ),
+                        decoration: BoxDecoration(
+                          color: statusBgColor,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Text(
+                          task.status.displayName,
+                          style: TextStyle(
+                            color: statusColor,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 11,
+                          ),
+                        ),
                       ),
-                      const SizedBox(width: 4),
-                      Text(
-                        '${task.dueDate!.month}/${task.dueDate!.day}/${task.dueDate!.year}',
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: Colors.grey,
+                      const SizedBox(height: 6),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 5,
+                        ),
+                        decoration: BoxDecoration(
+                          color: priorityBgColor,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Text(
+                          task.priority.displayName,
+                          style: TextStyle(
+                            color: priorityColor,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 11,
+                          ),
                         ),
                       ),
                     ],
                   ),
-                Row(
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.edit),
-                      onPressed: onEditPressed,
-                      visualDensity: VisualDensity.compact,
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.delete),
-                      onPressed: () => _showDeleteConfirmation(context),
-                      visualDensity: VisualDensity.compact,
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ],
+                ],
+              ),
+              const SizedBox(height: 12),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  if (task.dueDate != null)
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: Colors.amber.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.calendar_today,
+                            size: 14,
+                            color: Colors.amber[700],
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            '${task.dueDate!.month}/${task.dueDate!.day}/${task.dueDate!.year}',
+                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              color: Colors.amber[700],
+                              fontWeight: FontWeight.w600,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  else
+                    const SizedBox(),
+                  Row(
+                    children: [
+                      IconButton(
+                        icon: Icon(
+                          Icons.edit_outlined,
+                          color: Theme.of(context).primaryColor,
+                        ),
+                        onPressed: onEditPressed,
+                        visualDensity: VisualDensity.compact,
+                        tooltip: 'Edit task',
+                      ),
+                      IconButton(
+                        icon: const Icon(
+                          Icons.delete_outline,
+                          color: Colors.red,
+                        ),
+                        onPressed: () => _showDeleteConfirmation(context),
+                        visualDensity: VisualDensity.compact,
+                        tooltip: 'Delete task',
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -384,44 +542,86 @@ class _TaskCard extends StatelessWidget {
   void _showDeleteConfirmation(BuildContext context) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Delete Task?'),
-        content: Text('Are you sure you want to delete "${task.title}"?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              Navigator.pop(context);
-              try {
-                await ref.read(tasksProvider.notifier).deleteTask(task.id);
-                if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Task deleted successfully ✓'),
-                      duration: Duration(seconds: 2),
-                    ),
-                  );
-                }
-              } catch (e) {
-                if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Error: ${e.toString()}'),
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.red.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(
+                  Icons.warning_rounded,
+                  color: Colors.red,
+                  size: 32,
+                ),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Delete Task?',
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                'Are you sure you want to delete "${task.title}"? This cannot be undone.',
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: Colors.grey[600],
+                ),
+              ),
+              const SizedBox(height: 24),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text('Cancel'),
+                  ),
+                  ElevatedButton.icon(
+                    onPressed: () async {
+                      Navigator.pop(context);
+                      try {
+                        await ref.read(tasksProvider.notifier).deleteTask(task.id);
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Task deleted successfully ✓'),
+                              duration: Duration(seconds: 2),
+                              backgroundColor: Color(0xFF27AE60),
+                            ),
+                          );
+                        }
+                      } catch (e) {
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Error: ${e.toString()}'),
+                              backgroundColor: Colors.redAccent,
+                            ),
+                          );
+                        }
+                      }
+                    },
+                    icon: const Icon(Icons.delete),
+                    label: const Text('Delete'),
+                    style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.red,
                     ),
-                  );
-                }
-              }
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
-            ),
-            child: const Text('Delete'),
+                  ),
+                ],
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

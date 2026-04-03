@@ -61,7 +61,7 @@ class _TaskEditScreenState extends ConsumerState<TaskEditScreen> {
     }
   }
 
-  Future<void> _saveTask() async {
+  Future<void> _saveTask(BuildContext context) async {
     if (titleController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Title cannot be empty')),
@@ -89,6 +89,7 @@ class _TaskEditScreenState extends ConsumerState<TaskEditScreen> {
           const SnackBar(
             content: Text('Task updated successfully! ✓'),
             duration: Duration(seconds: 2),
+            backgroundColor: Color(0xFF27AE60),
           ),
         );
         Navigator.pop(context);
@@ -98,7 +99,7 @@ class _TaskEditScreenState extends ConsumerState<TaskEditScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Error: ${e.toString()}'),
-            backgroundColor: Colors.red,
+            backgroundColor: Colors.redAccent,
           ),
         );
       }
@@ -113,8 +114,27 @@ class _TaskEditScreenState extends ConsumerState<TaskEditScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Edit Task'),
+        title: const Text(
+          'Edit Task',
+          style: TextStyle(
+            fontWeight: FontWeight.w700,
+            fontSize: 22,
+          ),
+        ),
         elevation: 0,
+        centerTitle: true,
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Theme.of(context).primaryColor,
+                Theme.of(context).primaryColor.withOpacity(0.7),
+              ],
+            ),
+          ),
+        ),
       ),
       body: isLoading
           ? Center(
@@ -285,7 +305,7 @@ class _TaskEditScreenState extends ConsumerState<TaskEditScreen> {
                       const SizedBox(width: 12),
                       Expanded(
                         child: ElevatedButton(
-                          onPressed: _saveTask,
+                          onPressed: () => _saveTask(context),
                           child: const Text('Save Changes'),
                         ),
                       ),

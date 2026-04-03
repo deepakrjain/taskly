@@ -190,10 +190,16 @@ class AppTheme {
       ),
       
       // Floating action button theme
-      floatingActionButtonTheme: const FloatingActionButtonThemeData(
+      floatingActionButtonTheme: FloatingActionButtonThemeData(
         backgroundColor: secondary,
         foregroundColor: Colors.white,
         elevation: 8,
+        extendedPadding: const EdgeInsets.symmetric(horizontal: 20),
+        extendedTextStyle: const TextStyle(
+          fontWeight: FontWeight.w600,
+          fontSize: 16,
+          letterSpacing: 0.5,
+        ),
       ),
       
       // Chip theme
