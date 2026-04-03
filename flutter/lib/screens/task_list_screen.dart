@@ -3,7 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/task.dart';
 import '../models/task_status.dart';
 import '../models/task_priority.dart';
+import '../models/filter_type.dart';
 import '../providers/task_provider.dart';
+import '../providers/theme_provider.dart';
 import '../theme/app_theme.dart';
 import '../widgets/search_filter_bar.dart';
 import 'task_edit_screen.dart';
@@ -18,11 +20,13 @@ class TaskListScreen extends ConsumerStatefulWidget {
 class _TaskListScreenState extends ConsumerState<TaskListScreen> {
   String searchQuery = '';
   String statusFilter = '';
+  FilterType selectedFilter = FilterType.all;
 
   @override
   Widget build(BuildContext context) {
     final tasksAsyncValue = ref.watch(tasksProvider);
     final isLoading = ref.watch(isLoadingProvider);
+    final isDarkMode = ref.watch(themeProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -36,6 +40,13 @@ class _TaskListScreenState extends ConsumerState<TaskListScreen> {
         ),
         elevation: 0,
         centerTitle: true,
+        actions: [
+          IconButton(
+            icon: Icon(isDarkMode ? Icons.light_mode : Icons.dark_mode),
+            onPressed: () => ref.read(themeProvider.notifier).toggleTheme(),
+            tooltip: isDarkMode ? 'Light Mode' : 'Dark Mode',
+          ),
+        ],
         flexibleSpace: Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
@@ -63,6 +74,32 @@ class _TaskListScreenState extends ConsumerState<TaskListScreen> {
               setState(() => statusFilter = status);
               await ref.read(tasksProvider.notifier).filterByStatus(status);
             },
+          ),
+          // Quick filters
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              child: Row(
+                children: FilterType.values.map((filter) {
+                  final isSelected = selectedFilter == filter;
+                  return Padding(
+                    padding: const EdgeInsets.only(right: 8),
+                    child: FilterChip(
+                      selected: isSelected,
+                      label: Text(filter.displayName),
+                      avatar: Text(filter.label),
+                      onSelected: (_) {
+                        setState(() => selectedFilter = filter);
+                        _applyQuickFilter(ref, filter);
+                      },
+                      backgroundColor: Theme.of(context).colorScheme.surface,
+                      selectedColor: Theme.of(context).primaryColor.withOpacity(0.3),
+                    ),
+                  );
+                }).toList(),
+              ),
+            ),
           ),
           // Task list
           Expanded(
@@ -188,6 +225,63 @@ class _TaskListScreenState extends ConsumerState<TaskListScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Error reordering: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  void _applyQuickFilter(WidgetRef ref, FilterType filter) async {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final tomorrow = today.add(const Duration(days: 1));
+
+    try {
+      switch (filter) {
+        case FilterType.all:
+          // Reset to show all tasks
+          setState(() {
+            searchQuery = '';
+            statusFilter = '';
+          });
+          await ref.read(tasksProvider.notifier).loadTasks();
+          break;
+        case FilterType.myDay:
+          // Show tasks due today
+          final tasks = ref.read(tasksProvider).value ?? [];
+          final todayTasks = tasks.where((t) {
+            if (t.dueDate == null) return false;
+            final taskDate = DateTime(t.dueDate!.year, t.dueDate!.month, t.dueDate!.day);
+            return taskDate == today && t.status != TaskStatus.done;
+          }).toList();
+          // Update search to filter locally
+          setState(() => searchQuery = 'due-today');
+          break;
+        case FilterType.upcoming:
+          // Show tasks due in future
+          setState(() => searchQuery = 'upcoming');
+          break;
+        case FilterType.overdue:
+          // Show overdue tasks
+          final tasks = ref.read(tasksProvider).value ?? [];
+          final overdueTasks = tasks.where((t) {
+            if (t.dueDate == null) return false;
+            final taskDate = DateTime(t.dueDate!.year, t.dueDate!.month, t.dueDate!.day);
+            return taskDate.isBefore(today) && t.status != TaskStatus.done;
+          }).toList();
+          setState(() => searchQuery = 'overdue');
+          break;
+        case FilterType.completed:
+          // Show completed tasks only
+          await ref.read(tasksProvider.notifier).filterByStatus('Done');
+          break;
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error applying filter: ${e.toString()}'),
             backgroundColor: Colors.red,
           ),
         );
@@ -369,18 +463,19 @@ class _TaskCard extends StatelessWidget {
     final statusBgColor = AppTheme.getStatusBackgroundColor(task.status);
     final priorityColor = AppTheme.getPriorityColor(task.priority);
     final priorityBgColor = AppTheme.getPriorityBackgroundColor(task.priority);
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFFF8F9FF),
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: priorityColor.withOpacity(0.3),
+          color: priorityColor.withOpacity(0.4),
           width: 2,
         ),
         boxShadow: [
           BoxShadow(
-            color: Theme.of(context).primaryColor.withOpacity(0.08),
+            color: Theme.of(context).primaryColor.withOpacity(isDarkMode ? 0.15 : 0.08),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -398,7 +493,7 @@ class _TaskCard extends StatelessWidget {
                 children: [
                   Icon(
                     Icons.drag_handle,
-                    color: Colors.grey[400],
+                    color: isDarkMode ? Colors.grey[500] : Colors.grey[400],
                     size: 20,
                   ),
                   const SizedBox(width: 12),
@@ -421,7 +516,9 @@ class _TaskCard extends StatelessWidget {
                             Text(
                               task.description,
                               style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                color: Colors.grey[600],
+                                color: isDarkMode 
+                                  ? Colors.grey[400] 
+                                  : Colors.grey[600],
                                 fontSize: 12,
                               ),
                               maxLines: 1,
