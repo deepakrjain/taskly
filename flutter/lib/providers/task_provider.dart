@@ -126,9 +126,3 @@ class TasksNotifier extends StateNotifier<AsyncValue<List<Task>>> {
     await loadTasks(status: status);
   }
 }
-
-// Loading state provider for UI feedback during 2-second delays
-final isLoadingProvider = StateProvider<bool>((ref) => false);
-
-// Current task being edited
-final currentTaskProvider = StateProvider<Task?>((ref) => null);

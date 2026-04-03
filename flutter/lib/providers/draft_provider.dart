@@ -42,7 +42,6 @@ class DraftsNotifier extends StateNotifier<Map<String, Task>> {
         state = drafts;
       }
     } catch (e) {
-      print('Error loading drafts: $e');
       state = {};
     }
   }
@@ -58,7 +57,7 @@ class DraftsNotifier extends StateNotifier<Map<String, Task>> {
       );
       await _prefs.setString(_storageKey, draftsJson);
     } catch (e) {
-      print('Error saving draft: $e');
+      // Error handling - could implement logger here
     }
   }
 
@@ -75,7 +74,7 @@ class DraftsNotifier extends StateNotifier<Map<String, Task>> {
         await _prefs.setString(_storageKey, draftsJson);
       }
     } catch (e) {
-      print('Error updating draft: $e');
+      // Error handling - could implement logger here
     }
   }
 
@@ -91,7 +90,7 @@ class DraftsNotifier extends StateNotifier<Map<String, Task>> {
       );
       await _prefs.setString(_storageKey, draftsJson);
     } catch (e) {
-      print('Error removing draft: $e');
+      // Error handling - could implement logger here
     }
   }
 
@@ -101,7 +100,7 @@ class DraftsNotifier extends StateNotifier<Map<String, Task>> {
       state = {};
       await _prefs.remove(_storageKey);
     } catch (e) {
-      print('Error clearing drafts: $e');
+      // Error handling - could implement logger here
     }
   }
 
