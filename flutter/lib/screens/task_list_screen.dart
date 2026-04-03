@@ -502,10 +502,13 @@ class _TaskCard extends StatelessWidget {
                 children: [
                   ReorderableDragStartListener(
                     index: index,
-                    child: Icon(
-                      Icons.drag_handle,
-                      color: isDarkMode ? Colors.grey[500] : Colors.grey[400],
-                      size: 20,
+                    child: MouseRegion(
+                      cursor: SystemMouseCursors.grab,
+                      child: Icon(
+                        Icons.drag_handle,
+                        color: isDarkMode ? Colors.grey[500] : Colors.grey[400],
+                        size: 20,
+                      ),
                     ),
                   ),
                   const SizedBox(width: 12),
