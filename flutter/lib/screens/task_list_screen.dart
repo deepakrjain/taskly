@@ -174,6 +174,7 @@ class _TaskListScreenState extends ConsumerState<TaskListScreen> {
 
                 return ReorderableListView(
                   padding: const EdgeInsets.all(16),
+                  buildDefaultDragHandles: false,
                   onReorder: (oldIndex, newIndex) {
                     if (oldIndex < newIndex) {
                       newIndex -= 1;
