@@ -79,6 +79,12 @@ class _SearchFilterBarState extends State<SearchFilterBar> {
                     setState(() => selectedStatus = '');
                     widget.onStatusFilterChanged('');
                   },
+                  labelStyle: TextStyle(
+                    color: Theme.of(context).brightness == Brightness.dark
+                      ? Colors.white
+                      : Colors.black87,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
                 const SizedBox(width: 8),
                 FilterChip(
@@ -88,6 +94,12 @@ class _SearchFilterBarState extends State<SearchFilterBar> {
                     setState(() => selectedStatus = 'To-Do');
                     widget.onStatusFilterChanged('To-Do');
                   },
+                  labelStyle: TextStyle(
+                    color: Theme.of(context).brightness == Brightness.dark
+                      ? Colors.white
+                      : Colors.black87,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
                 const SizedBox(width: 8),
                 FilterChip(
@@ -97,6 +109,12 @@ class _SearchFilterBarState extends State<SearchFilterBar> {
                     setState(() => selectedStatus = 'In Progress');
                     widget.onStatusFilterChanged('In Progress');
                   },
+                  labelStyle: TextStyle(
+                    color: Theme.of(context).brightness == Brightness.dark
+                      ? Colors.white
+                      : Colors.black87,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
                 const SizedBox(width: 8),
                 FilterChip(
@@ -106,6 +124,12 @@ class _SearchFilterBarState extends State<SearchFilterBar> {
                     setState(() => selectedStatus = 'Done');
                     widget.onStatusFilterChanged('Done');
                   },
+                  labelStyle: TextStyle(
+                    color: Theme.of(context).brightness == Brightness.dark
+                      ? Colors.white
+                      : Colors.black87,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
               ],
             ),

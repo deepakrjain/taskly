@@ -185,18 +185,21 @@ class _TaskListScreenState extends ConsumerState<TaskListScreen> {
                       Container(
                         key: ValueKey(tasks[index].id),
                         margin: const EdgeInsets.only(bottom: 12),
-                        child: _TaskCard(
-                          task: tasks[index],
-                          ref: ref,
-                          onEditPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    TaskEditScreen(task: tasks[index]),
-                              ),
-                            );
-                          },
+                        child: ReorderableDragStartListener(
+                          index: index,
+                          child: _TaskCard(
+                            task: tasks[index],
+                            ref: ref,
+                            onEditPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      TaskEditScreen(task: tasks[index]),
+                                ),
+                              );
+                            },
+                          ),
                         ),
                       ),
                   ],
