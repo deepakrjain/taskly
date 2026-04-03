@@ -13,7 +13,7 @@ router = APIRouter(prefix="/tasks", tags=["tasks"])
 
 @router.get("", response_model=List[TaskResponse])
 async def list_tasks(
-    search: str = Query("", description="Search tasks by title"),
+    search: str = Query("", description="Search tasks by title or description"),
     status: str = Query("", description="Filter by status"),
     db: Session = Depends(get_db)
 ):
@@ -22,9 +22,12 @@ async def list_tasks(
     """
     query = db.query(Task)
 
-    # Apply search filter
+    # Apply search filter (searches both title and description)
     if search:
-        query = query.filter(Task.title.ilike(f"%{search}%"))
+        query = query.filter(or_(
+            Task.title.ilike(f"%{search}%"),
+            Task.description.ilike(f"%{search}%")
+        ))
 
     # Apply status filter
     if status and status != "All":
