@@ -207,154 +207,47 @@ flutter run -d chrome
 
 ## 🔌 API Documentation
 
-### Base URL
-```
-http://localhost:8000/api
-```
+**Base URL:** `http://localhost:8000/api`
 
-### Endpoints
-
-#### Get All Tasks
-```http
-GET /tasks
-```
-Response: List of all tasks
-
-#### Create Task
-```http
-POST /tasks
-Content-Type: application/json
-
-{
-  "title": "Task Title",
-  "description": "Task description",
-  "priority": "HIGH",
-  "due_date": "2024-12-31",
-  "status": "TO_DO"
-}
-```
-
-#### Get Task by ID
-```http
-GET /tasks/{task_id}
-```
-
-#### Update Task
-```http
-PUT /tasks/{task_id}
-Content-Type: application/json
-
-{
-  "title": "Updated Title",
-  "description": "Updated description",
-  "priority": "MEDIUM",
-  "due_date": "2024-12-31",
-  "status": "IN_PROGRESS"
-}
-```
-
-#### Delete Task
-```http
-DELETE /tasks/{task_id}
-```
-
-#### Search Tasks
-```http
-GET /tasks/search?q=search_term
-```
-
-#### Reorder Tasks
-```http
-POST /tasks/reorder
-Content-Type: application/json
-
-{
-  "task_ids": ["id1", "id2", "id3"]
-}
-```
-
-#### Filter by Status
-```http
-GET /tasks/filter?status=IN_PROGRESS
-```
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/tasks` | Get all tasks |
+| POST | `/tasks` | Create a new task |
+| GET | `/tasks/{task_id}` | Get task by ID |
+| PUT | `/tasks/{task_id}` | Update task |
+| DELETE | `/tasks/{task_id}` | Delete task |
+| GET | `/tasks/search?q=term` | Search tasks |
+| POST | `/tasks/reorder` | Reorder tasks |
+| GET | `/tasks/filter?status=STATUS` | Filter by status |
 
 ---
 
 ## ⚙️ Configuration
 
-### Backend Configuration
-Edit `backend/main.py` to configure:
-- Database URL
-- API host and port
-- CORS settings
+**Backend:** Edit `backend/main.py` for database URL, API host/port, and CORS settings.
 
-### Frontend Configuration
-Update API endpoint in `flutter/lib/services/api_service.dart`:
+**Frontend:** Update API endpoint in `flutter/lib/services/api_service.dart`:
 ```dart
 static const String baseUrl = 'http://localhost:8000/api';
 ```
 
-### Theme Customization
-Edit `flutter/lib/theme/app_theme.dart` to customize:
-- Color schemes
-- Typography
-- Component styles
+**Theme:** Customize colors and typography in `flutter/lib/theme/app_theme.dart`.
 
 ---
 
 ## 🧪 Development
 
-### Running Tests
 ```bash
-cd flutter
-flutter test
-```
-
-### Code Quality
-```bash
-cd flutter
-flutter analyze
-```
-
-### Building for Release
-
-**Web Build:**
-```bash
-cd flutter
-flutter build web
-```
-
-**Android Build:**
-```bash
-cd flutter
-flutter build apk
-```
-
-**iOS Build:**
-```bash
-cd flutter
-flutter build ios
+flutter test                  # Run tests
+flutter analyze               # Check code quality
+flutter build web             # Build web release
 ```
 
 ---
 
 ## 📝 Database Schema
 
-### Tasks Table
-| Column | Type | Description |
-|--------|------|-------------|
-| id | String (UUID) | Primary key |
-| title | String | Task title |
-| description | String | Task description |
-| status | String | TO_DO, IN_PROGRESS, DONE |
-| priority | String | LOW, MEDIUM, HIGH |
-| due_date | DateTime | Optional due date |
-| order_index | Integer | Task order for reordering |
-| is_recurring | Boolean | Whether task recurs |
-| recurrence_type | String | Daily, weekly, monthly (if recurring) |
-| blocked_by | String | ID of blocking task (if any) |
-| created_at | DateTime | Creation timestamp |
-| updated_at | DateTime | Last update timestamp |
+The **tasks** table includes: id (UUID), title, description, status, priority, due_date, order_index, is_recurring, recurrence_type, blocked_by, created_at, and updated_at.
 
 ---
 
@@ -384,30 +277,4 @@ flutter run
 
 ## 📄 License
 
-This project is provided as-is for educational and personal use.
-
----
-
-## 👨‍💻 Author
-
-Built with ❤️ for efficient task management.
-
----
-
-## 🔮 Future Enhancements
-
-- Recurring task automation
-- Task categories/tags
-- Task notifications and reminders
-- Collaborative task sharing
-- Analytics and insights
-- Cloud synchronization
-- Mobile app deployment
-
----
-
-## 📞 Support
-
-For issues or questions, refer to the project documentation or consult the inline code comments throughout the repository.
-
-**Happy task managing! 🚀**
+This project is licensed under the [MIT License](LICENSE). See LICENSE file for details.
